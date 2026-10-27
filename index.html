@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda de Campo — Estação Reprodutiva 26/27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F7F4; --bg-soft:#EFF1EB; --panel:#FFFFFF;
+  --ink:#191C18; --ink-soft:#6B7268; --ink-faint:#A2A89C;
+  --line:#E6E7E1; --line-strong:#D6D9CE;
+
+  /* paleta pecuária: pasto, céu, terra, ameixa, palha, ferro */
+  --rafael:#2F6B4F;  --rafael-bg:#E7F2EC;  --rafael-line:#BFE0CD;
+  --danilo:#2E6E90;  --danilo-bg:#E5F0F5;  --danilo-line:#BEDCE8;
+  --vicente:#93602E; --vicente-bg:#F2E9DC; --vicente-line:#E0CBA9;
+  --tiago:#7A4F73;   --tiago-bg:#F1E9F0;   --tiago-line:#DEC9DA;
+  --fazenda:#A9822A; --fazenda-bg:#F5EFD9; --fazenda-line:#E3CE8D;
+  --outros:#556169;  --outros-bg:#EBEDEE;  --outros-line:#CDD3D6;
+
+  --accent:#B5482E; --radius:14px; --radius-sm:8px;
+  --shadow:0 1px 2px rgba(25,28,24,.04), 0 8px 24px -12px rgba(25,28,24,.14);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px 80px;}
+
+header{padding:40px 0 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand .mark{flex:none;width:44px;height:44px;border-radius:12px;background:var(--rafael);display:flex;align-items:center;justify-content:center;}
+.brand h1{font-weight:800;font-size:clamp(24px,3.4vw,32px);letter-spacing:-.02em;margin:0;line-height:1.05;}
+.brand p{margin:3px 0 0;font-size:13.5px;color:var(--ink-soft);font-weight:500;}
+.season-pill{font-family:'IBM Plex Mono',monospace;background:var(--panel);border:1px solid var(--line-strong);border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;letter-spacing:.04em;display:flex;align-items:center;gap:8px;}
+.season-pill .pulse{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;margin-bottom:24px;}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px;}
+.stat .n{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:21px;}
+.stat .l{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;font-weight:600;}
+
+.controls{display:flex;flex-direction:column;gap:12px;margin-bottom:22px;}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tags{display:flex;gap:7px;flex-wrap:wrap;}
+.tag{--c:#888;--cbg:#eee;--cl:#ccc;display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid var(--cl);background:var(--cbg);color:var(--c);font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;cursor:pointer;user-select:none;letter-spacing:-.01em;transition:opacity .12s,transform .1s;}
+.tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c);flex:none;}
+.tag.off{opacity:.45;background:var(--bg-soft);border-color:var(--line);color:var(--ink-soft);}
+.tag.off::before{background:var(--ink-faint);}
+.tag:hover{transform:translateY(-1px);}
+.tag#tagAll{--c:var(--ink);--cbg:var(--panel);--cl:var(--line-strong);}
+
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:10px 14px;}
+.search input{border:none;outline:none;background:transparent;font-family:'Manrope',sans-serif;font-size:14px;color:var(--ink);width:100%;font-weight:500;}
+.search input::placeholder{color:var(--ink-faint);}
+.search svg{flex:none;opacity:.45;}
+.views{display:flex;gap:2px;background:var(--bg-soft);border-radius:var(--radius-sm);padding:3px;}
+.views button{border:none;background:transparent;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;font-family:'Manrope',sans-serif;}
+.views button.active{background:var(--panel);color:var(--ink);box-shadow:var(--shadow);}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.view{display:none;} .view.active{display:block;}
+
+.cal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);}
+.cal-head .month{font-weight:800;font-size:19px;letter-spacing:-.01em;}
+.cal-nav{display:flex;gap:6px;align-items:center;}
+.cal-nav button{border:1px solid var(--line-strong);background:var(--panel);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:15px;}
+.cal-nav button:hover{background:var(--bg-soft);}
+.cal-nav .today{width:auto;padding:0 13px;font-size:12px;font-weight:700;font-family:'Manrope',sans-serif;}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--line);}
+.weekdays div{padding:10px 6px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--ink-faint);text-transform:uppercase;}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.day{min-height:96px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px 7px;cursor:pointer;transition:background .1s;min-width:0;}
+.day:nth-child(7n){border-right:none;}
+.day:hover{background:var(--bg-soft);}
+.day.other{color:var(--ink-faint);background:#FCFCFB;cursor:default;}
+.day .num{font-size:12.5px;font-weight:700;display:inline-block;margin-bottom:6px;}
+.day.today .num{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;}
+.bar{font-size:10.5px;padding:3px 7px;border-radius:6px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+.more{font-size:10px;color:var(--ink-soft);font-weight:600;padding-left:7px;}
+
+.list-month{font-weight:800;font-size:16px;letter-spacing:-.01em;padding:16px 22px 8px;position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);z-index:1;}
+.day-group{border-bottom:1px solid var(--line);}
+.day-group.is-today .d{background:var(--accent);color:#fff;}
+.day-group-head{display:flex;align-items:baseline;gap:10px;padding:13px 22px 4px;}
+.day-group-head .d{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;background:var(--bg-soft);padding:3px 9px;border-radius:7px;}
+.day-group-head .w{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);font-weight:700;}
+.item{display:flex;align-items:flex-start;gap:12px;padding:9px 22px 9px 36px;border-top:1px solid var(--line);}
+.item:first-of-type{border-top:none;}
+.dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex:none;}
+.item-body{flex:1;min-width:0;}
+.item-farm{font-weight:700;font-size:14px;letter-spacing:-.005em;}
+.item-act{font-size:13px;color:var(--ink-soft);margin-top:1px;}
+.badges{display:flex;gap:4px;flex:none;flex-wrap:wrap;justify-content:flex-end;}
+.badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;}
+.empty{padding:56px 20px;text-align:center;color:var(--ink-soft);}
+.empty b{display:block;font-size:17px;color:var(--ink);margin-bottom:6px;font-weight:800;}
+
+.farms-wrap{display:grid;grid-template-columns:290px 1fr;min-height:520px;}
+.farms-list{border-right:1px solid var(--line);max-height:660px;overflow:auto;}
+.farm-card{padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;border-left:3px solid transparent;}
+.farm-card:hover{background:var(--bg-soft);}
+.farm-card.active{background:var(--fazenda-bg);border-left-color:var(--fazenda);}
+.farm-card .name{font-weight:700;font-size:13.5px;line-height:1.3;}
+.farm-card .muni{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+.farm-card .meta{display:flex;gap:8px;margin-top:8px;align-items:center;}
+.farm-card .meta span{font-size:11px;color:var(--ink-soft);font-weight:600;}
+.dotrow{display:flex;gap:3px;}
+.dotrow .d{width:6px;height:6px;border-radius:50%;}
+.farm-detail{padding:24px 28px;}
+.farm-detail h2{font-size:22px;margin:0 0 2px;font-weight:800;letter-spacing:-.01em;}
+.farm-detail .sub{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-bottom:22px;}
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:2px;background:var(--line-strong);}
+.tnode{position:relative;padding-bottom:20px;}
+.tnode::before{content:"";position:absolute;left:-24px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--panel);border:2.5px solid var(--c,#888);}
+.tnode.past{opacity:.55;}
+.tnode .tdate{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:700;color:var(--ink-soft);}
+.tnode .tact{font-size:14.5px;font-weight:700;margin-top:2px;}
+.tnode .badges{justify-content:flex-start;margin-top:6px;}
+
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line);}
+.legend .li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-soft);font-weight:600;}
+.legend .dot{margin-top:0;}
+
+.drawer-overlay{position:fixed;inset:0;background:rgba(25,28,24,.28);z-index:20;opacity:0;pointer-events:none;transition:opacity .18s;}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:var(--panel);z-index:21;box-shadow:-16px 0 40px rgba(25,28,24,.10);transform:translateX(100%);transition:transform .22s ease;overflow-y:auto;}
+.drawer.open{transform:translateX(0);}
+.drawer-head{padding:22px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;position:sticky;top:0;background:var(--panel);}
+.drawer-head .dd{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
+.drawer-head h3{font-size:20px;margin:3px 0 0;font-weight:800;letter-spacing:-.01em;}
+.drawer-head button{border:none;background:var(--bg-soft);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;color:var(--ink);}
+.drawer-body{padding:14px 24px 30px;}
+.drawer-item{padding:14px 0;border-bottom:1px solid var(--line);}
+.drawer-item:last-child{border-bottom:none;}
+.drawer-item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.drawer-item .t{font-weight:700;font-size:15px;}
+.drawer-item .m{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.drawer-item .a{font-size:13.5px;margin-top:6px;}
+.drawer-item .s{font-size:11.5px;color:var(--ink-faint);margin-top:6px;font-style:italic;}
+
+@media (max-width:720px){
+  .farms-wrap{grid-template-columns:1fr;}
+  .farms-list{max-height:280px;border-right:none;border-bottom:1px solid var(--line);}
+  .day{min-height:60px;padding:6px 4px;}
+  .bar{font-size:0;height:6px;padding:0;}
+  .item{padding-left:22px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M4 17c0-4.5 3.5-8 8-8s8 3.5 8 8" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <path d="M8 9c-1.3-1.3-1.3-3 0-4.3M16 9c1.3-1.3 1.3-3 0-4.3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="8.2" cy="17.2" r="1.3" fill="#fff"/><circle cx="15.8" cy="17.2" r="1.3" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Agenda de Campo</h1>
+        <p id="subtitle"></p>
+      </div>
+    </div>
+    <div class="season-pill"><span class="pulse"></span>Estação 2026 / 2027</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="row tags" id="tagRow"></div>
+    <div class="row">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="searchInput" type="text" placeholder="Buscar fazenda ou atividade (ex: IATF, Remanso, D0...)">
+      </div>
+      <div class="views">
+        <button data-view="calendar" class="active">Calendário</button>
+        <button data-view="list">Lista</button>
+        <button data-view="farms">Fazendas</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="view active" id="view-calendar">
+      <div class="cal-head">
+        <div class="month" id="calMonthLabel"></div>
+        <div class="cal-nav">
+          <button id="prevMonth" aria-label="Mês anterior">‹</button>
+          <button class="today" id="gotoToday">Hoje</button>
+          <button id="nextMonth" aria-label="Próximo mês">›</button>
+        </div>
+      </div>
+      <div class="weekdays"><div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div></div>
+      <div class="grid" id="calGrid"></div>
+    </div>
+    <div class="view" id="view-list"></div>
+    <div class="view" id="view-farms">
+      <div class="farms-wrap">
+        <div class="farms-list" id="farmsList"></div>
+        <div class="farm-detail" id="farmDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div><div class="dd" id="drawerDate"></div><h3 id="drawerTitle"></h3></div>
+    <button id="drawerClose" aria-label="Fechar">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<script>
+const EVENTS = [{"date":"2026-07-20","farm":"PITANGA","activity":"DG + D0 VACAS 1º BLOCO IATF","resp":["DANILO"],"type":"fazenda"},{"date":"2026-07-24","farm":"REMANSO","activity":"INDUÇÃO CICLICIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-07-28","farm":"PITANGA","activity":"D8 VACAS 1º BLOCO IATF","resp":["DANILO"],"type":"fazenda"},{"date":"2026-07-30","farm":"PITANGA","activity":"D10 VACAS 1º BLOCO IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-08-05","farm":"SAO_PEDRO","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-08-15","farm":"SAO_PEDRO","activity":"D0 RECEPTORAS EMBRIÃO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-08-17","farm":"REMANSO","activity":"AVALIAÇÃO + D0 NOVILHAS F1 1º BLOCO IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-08-21","farm":"PITANGA","activity":"D0 VACAS 2º BLOCO IATF","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-08-22","farm":"ABRA","activity":"MANEJO INDUÇÃO CICLICIDADE NOVILHAS NELORE/F1","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-08-24","farm":"SAO_PEDRO","activity":"D9 RECEPTORAS EMBRIÃO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-08-25","farm":"DIVINAL","activity":"DG","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-08-25","farm":"REMANSO","activity":"D8 NOVILHAS F1 1º BLOCO IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-08-26","farm":"SAO_PEDRO","activity":"GNRH RECEPTORAS EMBRIÃO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-08-27","farm":"REMANSO","activity":"D10 NOVILHAS F1 1º BLOCO IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-08-28","farm":"NOVO_HORIZONTE","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-08-29","farm":"PITANGA","activity":"DG + D8 VACAS 2º BLOCO IATF","resp":["DANILO"],"type":"fazenda"},{"date":"2026-08-31","farm":"PITANGA","activity":"D10 VACAS 2º BLOCO IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-01","farm":null,"activity":"MÉDICO CARDIO","resp":["RAFAEL"],"type":"pessoal"},{"date":"2026-09-01","farm":"FLORESTA_NEGRA","activity":"MANEJO PRÉ-SYNCH","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-02","farm":"SAO_PEDRO","activity":"TETF RECEPTORAS EMBRIÃO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-03","farm":"REMANSO","activity":"TETF","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-09-04","farm":"SAO_JOSE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-05","farm":"ABRA","activity":"MANEJO PRÉ-SYNCH LOTE IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-08","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-08","farm":"REMANSO","activity":"D0 SUPERPRECOCE F1 NOVILHAS 2º BLOCO IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-09","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-09","farm":"REMANSO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE F1 RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-11","farm":"SAO_JORGE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-12","farm":"FLORESTA_NEGRA","activity":"D0 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-14","farm":"SAO_JOSE","activity":"D0 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-14","farm":"TRES_LAGOAS","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-15","farm":"ABRA","activity":"D0 LOTE IATF + AVALIAÇÃO RECEPTORAS + D0","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-15","farm":"NOVO_HORIZONTE","activity":"INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-15","farm":"REMANSO","activity":"D7 SUPERPRECOCE F1 NOVILHAS 2º BLOCO IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-16","farm":"NOVO_HORIZONTE","activity":"D8 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-17","farm":"REMANSO","activity":"DOPPLER/D9 F1 NOVILHAS 2º BLOCO IATF","resp":["EQUIPE"],"type":"fazenda"},{"date":"2026-09-18","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-18","farm":"SAO_PEDRO","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-19","farm":"GRANDE_SERTAO","activity":"D0 PARIDAS/SOLTEIRAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-19","farm":"REMANSO","activity":"D0 MATERNIDADE F1 RECEPTORAS 1º TE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-19","farm":"SANTO_EXPEDITO","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-21","farm":"DUAS_MENINAS","activity":"D0 NULÍPARAS/PRIMÍPARAS/MULTÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-21","farm":"FLORESTA_NEGRA","activity":"D9 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-21","farm":"SAO_JORGE","activity":"D0 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-22","farm":null,"activity":"CONSULTA DERMATO","resp":["RAFAEL"],"type":"pessoal"},{"date":"2026-09-22","farm":"SAO_JOSE","activity":"D8 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-23","farm":"ABRA","activity":"D8 LOTE IATF CEDO - D8 RECEPTORAS TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-23","farm":"FLORESTA_NEGRA","activity":"D11 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-24","farm":"SAO_JOSE","activity":"D10 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-25","farm":"ABRA","activity":"D10 LOTE IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-25","farm":"NOVO_HORIZONTE","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-25","farm":"SANTO_ANTONIO","activity":"INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-25","farm":"TRES_LAGOAS","activity":"D0 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-09-28","farm":"BELA_VISTA","activity":"DG+D0 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-28","farm":"GRANDE_SERTAO","activity":"D9 PARIDAS/SOLTEIRAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-28","farm":"REMANSO","activity":"D9 RECEPTORAS 1º TE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-09-28","farm":"SAO_PEDRO","activity":"DG+D0 1º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-29","farm":"DUAS_MENINAS","activity":"D8 NULÍPARAS/PRIMÍPARAS/MULTÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-29","farm":"SAO_JORGE","activity":"D8 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-09-30","farm":"GRANDE_SERTAO","activity":"D11 PARIDAS/SOLTEIRAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-09-30","farm":"REMANSO","activity":"GNRH F1 RECEPTORAS 1º TE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-01","farm":"DUAS_MENINAS","activity":"D10 NULÍPARAS/PRIMÍPARAS/MULTÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-01","farm":"SANTO_EXPEDITO","activity":"D0 1º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-01","farm":"SAO_JORGE","activity":"D10 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-02","farm":"ABRA","activity":"2º TETF RECEPTORAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-02","farm":"PITANGA","activity":"DG FINAL","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-03","farm":"TRES_LAGOAS","activity":"D8 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-05","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-05","farm":"TRES_LAGOAS","activity":"D10 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-06","farm":"ABRA","activity":"MANEJO PRÉ-SYNCH MATERNIDADE LOTE IATF/RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-06","farm":"DIVINAL","activity":"DG PRECOCE","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-10-06","farm":"INDIANA","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-06","farm":"SAO_JOSE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-06","farm":"SAO_PEDRO","activity":"D8 1º IATF","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-07","farm":"BELA_VISTA","activity":"D8 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-07","farm":"REMANSO","activity":"1º TETF F1 RECEPTORAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-08","farm":"GRANDE_SERTAO","activity":"MANEJO INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-08","farm":"INDIANA","activity":"PRÉ-SYNCH","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-08","farm":"SAO_PEDRO","activity":"D10 1º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-09","farm":"BELA_VISTA","activity":"D10 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-09","farm":"NOVO_HORIZONTE","activity":"AVALIAÇÃO NOVILHAS + D0 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-09","farm":"SANTO_ANTONIO","activity":"MANEJO PRÉ-SYNCH VACAS/RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-09","farm":"SANTO_EXPEDITO","activity":"D8 1º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-10","farm":null,"activity":"CASA","resp":["RAFAEL"],"type":"pessoal"},{"date":"2026-10-10","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-10","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 2º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-10-10","farm":"OURO_BRANCO","activity":"INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-11","farm":"SANTO_EXPEDITO","activity":"D10 1º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-12","farm":null,"activity":"NOSSA SENHORA APARECIDA","resp":["RAFAEL"],"type":"feriado"},{"date":"2026-10-12","farm":"SAO_CARLOS","activity":"D0 1º IATF","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-13","farm":"NOVO_HORIZONTE","activity":"D8 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-13","farm":"SAO_JORGE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-14","farm":null,"activity":"CLÍNICA","resp":["RAFAEL"],"type":"pessoal"},{"date":"2026-10-14","farm":"MONTE_VERDE","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-15","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-15","farm":"REMANSO","activity":"MANEJO PRÉ-SYNCH NELORE PRIMÍPARAS 1º BLOCO IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-16","farm":"ABRA","activity":"D0 MATERNIDADE LOTE IATF/RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-16","farm":"FLORESTA_NEGRA","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-16","farm":"REMANSO","activity":"DIAGNÓSTICO GERAL NOVILHAS F1 - AVALIAÇÃO NOVILHAS NELORE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-16","farm":"SAO_JOSE","activity":"D0 VACAS 2º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-10-16","farm":"TRES_LAGOAS","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-17","farm":"ABRA","activity":"D0 LOTE IATF + D0 RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-17","farm":"NOVO_HORIZONTE","activity":"D8 LOTE 1","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-10-19","farm":"DIVINAL","activity":"DG PRECOCE","resp":["VICENTE"],"type":"fazenda","src":"aba Vicente"},{"date":"2026-10-19","farm":"DUAS_MENINAS","activity":"D0 TODOS BLOCO 1","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-19","farm":"NOVO_HORIZONTE","activity":"DG+D9 VACAS + D10 NOVILHAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-19","farm":"SANTO_ANTONIO","activity":"D0 VACAS/RECEPTORAS 1º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-20","farm":"DIVINAL","activity":"DG","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-20","farm":"DUAS_MENINAS","activity":"D0 MATERNIDADE 2","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-20","farm":"INDIANA","activity":"D0 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-21","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-21","farm":"SAO_CARLOS","activity":"D8 1º BLOCO IATF","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-22","farm":"GRANDE_SERTAO","activity":"D0 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-22","farm":"SAO_JORGE","activity":"D0 2º BLOCO","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-10-23","farm":"OURO_BRANCO","activity":"MANEJO PRÉ-SYNCH VACAS/RECEPTORAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-23","farm":"SANTO_EXPEDITO","activity":"D0 2º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-23","farm":"SAO_CARLOS","activity":"1º BLOCO IATF","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-10-23","farm":"SAO_JORGE","activity":"D0 VACAS 2º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-23","farm":"SAO_JOSE","activity":"INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-24","farm":"ABRA","activity":"DG+D7/8 LOTE IATF/RECEPTORAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-24","farm":"SAO_JOSE","activity":"DG+D8 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-26","farm":"ABRA","activity":"D9/10 LOTE IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-26","farm":"REMANSO","activity":"D0 RECEPTORAS F1/NELORE PRIMÍPARAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-26","farm":"SAO_JOSE","activity":"D10 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-27","farm":"DUAS_MENINAS","activity":"DG+D8 BLOCO 1 + D7 MATERNIDADE 2","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-27","farm":"FLORESTA_NEGRA","activity":"DG+D0 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-27","farm":"MONTE_VERDE","activity":"D0 VACAS 1º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-27","farm":"REMANSO","activity":"D0 RECEPTORAS MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-27","farm":"SANTO_ANTONIO","activity":"D8 VACAS/RECEPTORAS 1º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-27","farm":"TRES_LAGOAS","activity":"D0 VACAS 2º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-28","farm":"INDIANA","activity":"D8 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-28","farm":"REMANSO","activity":"IMPLANTAÇÃO DIUB","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-29","farm":"DUAS_MENINAS","activity":"D10 VAZIAS BLOCO 1 + MATERNIDADE 2","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-29","farm":"GRANDE_SERTAO","activity":"DG+D7 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-29","farm":"SANTO_ANTONIO","activity":"D10 VACAS/RECEPTORAS 1º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-30","farm":"INDIANA","activity":"D10 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-30","farm":"SANTO_EXPEDITO","activity":"D7 2º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-30","farm":"SAO_JORGE","activity":"INDUÇÃO NOVILHAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-30","farm":"SAO_PEDRO","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-30","farm":"SETE_MONTES","activity":"D0 LOTE 144 VAQUILLAS TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-31","farm":"GRANDE_SERTAO","activity":"D9 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-10-31","farm":"SAO_JORGE","activity":"DG+D8 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-10-31","farm":"SETE_MONTES","activity":"D0 LOTE 120 ANIMAIS MANHÃ","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-31","farm":"SETE_MONTES","activity":"D0 LOTE 81 VAQUILLAS MANHÃ","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-31","farm":"SETE_MONTES","activity":"D0 LOTE 197 VAQUILLAS TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-10-31","farm":"SETE_MONTES","activity":"D0 LOTE 105 TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-01","farm":"SANTO_EXPEDITO","activity":"DOPPLER + D9 2º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-01","farm":"SETE_MONTES","activity":"D0 LOTE 58 ANIMAIS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-01","farm":"SETE_MONTES","activity":"D0 LOTE 39 ANIMAIS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-01","farm":"SETE_MONTES","activity":"D0 LOTE 51 ANIMAIS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-02","farm":"ABRA","activity":"2º TETF RECEPTORAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-02","farm":"GRANDE_SERTAO","activity":"D0 NOVILHAS 1º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-02","farm":"SAO_JORGE","activity":"D10 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-03","farm":"OURO_BRANCO","activity":"D0 VACAS/RECEPTORAS 1º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-03","farm":"REMANSO","activity":"DG + D8 RECEPTORAS F1/NELORE PRIMÍPARAS - GNRH RECEPTORAS MATERNIDADE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-04","farm":"FLORESTA_NEGRA","activity":"D8 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-04","farm":"MONTE_VERDE","activity":"D8 VACAS 1º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-04","farm":"REMANSO","activity":"D8 RECEPTORAS MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-04","farm":"TRES_LAGOAS","activity":"DG+D8 VACAS 2º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-05","farm":"REMANSO","activity":"GNRH F1 RECEPTORAS - D10 NOVILHAS/PRIMÍPARAS NELORE","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-11-05","farm":"SANTO_ANTONIO","activity":"TETF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-06","farm":"FLORESTA_NEGRA","activity":"D10 VACAS 1º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-06","farm":"MONTE_VERDE","activity":"D10 VACAS 1º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-06","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 2º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-11-06","farm":"REMANSO","activity":"GNRH RECEPTORAS MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-06","farm":"SAO_JOSE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-06","farm":"TRES_LAGOAS","activity":"D10 VACAS 2º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-07","farm":"ABRA","activity":"MANEJO PRÉ-SYNCH MATERNIDADE LOTE IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-07","farm":"SETE_MONTES","activity":"D8 LOTE 144 VAQUILLAS TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-08","farm":"SETE_MONTES","activity":"D8 LOTE 120 ANIMAIS MANHÃ","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-08","farm":"SETE_MONTES","activity":"D8 LOTE 81 VAQUILLAS MANHÃ","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-08","farm":"SETE_MONTES","activity":"D8 LOTE 197 VAQUILLAS TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-08","farm":"SETE_MONTES","activity":"D8 LOTE 105 TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-09","farm":"DIVINAL","activity":"DG PRECOCE","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-11-09","farm":"GRANDE_SERTAO","activity":"D7 NOVILHAS 1º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-09","farm":"SAO_PEDRO","activity":"DG+D0 2º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-09","farm":"SETE_MONTES","activity":"DG+D8 LOTE 58 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-09","farm":"SETE_MONTES","activity":"DG+D8 LOTE 39 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-09","farm":"SETE_MONTES","activity":"DG+D8 LOTE 51 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-09","farm":"SETE_MONTES","activity":"D10 LOTE 144 VAQUILLAS TARDE","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-10","farm":"SANTO_ANTONIO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-10","farm":"SETE_MONTES","activity":"D10 LOTE 120 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-10","farm":"SETE_MONTES","activity":"D10 LOTE 81 VAQUILLAS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-10","farm":"SETE_MONTES","activity":"D10 LOTE 197 VAQUILLAS TARDE","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-10","farm":"SETE_MONTES","activity":"D10 LOTE 105 TARDE","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-11","farm":"GRANDE_SERTAO","activity":"D10 NOVILHAS 1º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-11","farm":"OURO_BRANCO","activity":"D8 VACAS/RECEPTORAS 1º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-11","farm":"SETE_MONTES","activity":"D0 LOTE 58 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-11","farm":"SETE_MONTES","activity":"D0 LOTE 39 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-11","farm":"SETE_MONTES","activity":"D0 LOTE 51 ANIMAIS MANHÃ","resp":["RAFAEL","TIAGO"],"type":"fazenda"},{"date":"2026-11-12","farm":"NOVO_HORIZONTE","activity":"D0 VACAS/NOVILHAS 3º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-11-12","farm":"OURO_BRANCO","activity":"OPU DOADORAS","resp":["CENATTE"],"type":"fazenda"},{"date":"2026-11-12","farm":"REMANSO","activity":"3º TETF RECEPTORAS F1/PRIMÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-13","farm":"INDIANA","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-13","farm":"OURO_BRANCO","activity":"D10 VACAS REFUGO 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-13","farm":"REMANSO","activity":"3º TETF RECEPTORAS MATERNIDADE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-13","farm":"SANTO_EXPEDITO","activity":"D0 3º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-14","farm":"NOVO_HORIZONTE","activity":"DG+D8 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-14","farm":"REMANSO","activity":"PRÉ-SYNCH NOVILHAS NELORE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-14","farm":"SAO_JORGE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-16","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-16","farm":"SAO_JOSE","activity":"D0 VACAS/AVALIAÇÃO NOVILHAS 3º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-11-17","farm":"ABRA","activity":"D0 LOTE IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-17","farm":"BELA_VISTA","activity":"DG+D0 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-17","farm":"SAO_PEDRO","activity":"D8 2º IATF","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-18","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-19","farm":"NOVO_HORIZONTE","activity":"DG+D7 VACAS/NOVILHAS 3º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-19","farm":"SAO_PEDRO","activity":"D10 2º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-20","farm":"MONTE_VERDE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-20","farm":"OURO_BRANCO","activity":"TETF 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-20","farm":"SANTO_ANTONIO","activity":"D0 VACAS 2º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-20","farm":"SANTO_EXPEDITO","activity":"D7 3º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-20","farm":"TRES_LAGOAS","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-21","farm":"DUAS_MENINAS","activity":"D0 TODOS BLOCO 2","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-21","farm":"NOVO_HORIZONTE","activity":"D10 VACAS/NOVILHAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-22","farm":"SANTO_EXPEDITO","activity":"DOPPLER + D9 3º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-23","farm":"DIVINAL","activity":"DG","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-11-23","farm":"DUAS_MENINAS","activity":"D0 MATERNIDADE 3","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-23","farm":"GRANDE_SERTAO","activity":"D0 NOVILHAS SUPERPRECOCE 2º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-23","farm":"INDIANA","activity":"D0 2º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-24","farm":"SAO_JORGE","activity":"D0 VACAS/AVALIAÇÃO NOVILHAS 3º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-11-24","farm":"SAO_JOSE","activity":"DG+D8 VACAS/NOVILHAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-25","farm":"ABRA","activity":"DG+D8 LOTE IATF CEDO - DG LOTE RECEPTORAS TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-25","farm":"SAO_CARLOS","activity":"DG + D0 2º BLOCO IATF","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-11-26","farm":"BELA_VISTA","activity":"D9 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-26","farm":"SAO_JOSE","activity":"D10 VACAS/NOVILHAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-27","farm":"ABRA","activity":"D10 LOTE IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-27","farm":"FLORESTA_NEGRA","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-27","farm":"REMANSO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE MULTÍPARAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-28","farm":"BELA_VISTA","activity":"D11 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-28","farm":"GRANDE_SERTAO","activity":"D0 VACAS 3º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-28","farm":"SANTO_ANTONIO","activity":"DG+D8 VACAS 2º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-11-28","farm":"SETE_MONTES","activity":"D0 A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-28","farm":"SETE_MONTES","activity":"D0 B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-30","farm":"DUAS_MENINAS","activity":"DG+D9 BLOCO 2 + D7 MATERNIDADE 3","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-30","farm":"GRANDE_SERTAO","activity":"D7 NOVILHAS SUPERPRECOCE 2º IATF TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-30","farm":"MONTE_VERDE","activity":"D0 VACAS 2º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-11-30","farm":"SANTO_ANTONIO","activity":"D10 VACAS 2º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-11-30","farm":"TRES_LAGOAS","activity":"D0 VACAS 3º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-01","farm":"INDIANA","activity":"DG+D8 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-01","farm":"SETE_MONTES","activity":"D0 A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-02","farm":"DUAS_MENINAS","activity":"D11 VACAS VAZIAS BLOCO 2 + D10 MATERNIDADE 3","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-02","farm":"GRANDE_SERTAO","activity":"DOPPLER + D9 2º IATF IATF TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-02","farm":"SAO_JORGE","activity":"DG+D8 VACAS/NOVILHAS 3º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-12-02","farm":"SETE_MONTES","activity":"D0 B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-03","farm":"INDIANA","activity":"D10 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-03","farm":"SAO_CARLOS","activity":"D8 2º BLOCO IATF","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-12-04","farm":"OURO_BRANCO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-04","farm":"SANTO_EXPEDITO","activity":"D0 4º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-04","farm":"SAO_JORGE","activity":"D10 VACAS/NOVILHAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-05","farm":"SAO_CARLOS","activity":"D10 2º BLOCO","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-12-06","farm":"SETE_MONTES","activity":"D8 A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-07","farm":"FLORESTA_NEGRA","activity":"DG+D0 VACAS 3º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-12-07","farm":"GRANDE_SERTAO","activity":"DG+D9 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-07","farm":"REMANSO","activity":"DG+D0 RECEPTORAS EMBRIÃO + D0 MATERNIDADE MULTÍPARAS + AVALIAÇÃO NOVILHAS D0","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-07","farm":"SETE_MONTES","activity":"D8 B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-08","farm":"MONTE_VERDE","activity":"DG+D8 VACAS 2º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-08","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 3º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-12-08","farm":"REMANSO","activity":"D0 NOVILHAS NELORE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-08","farm":"SETE_MONTES","activity":"GNRH A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-08","farm":"TRES_LAGOAS","activity":"DG+D8 VACAS 3º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-09","farm":"ABRA","activity":"D0 LOTE IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-09","farm":"GRANDE_SERTAO","activity":"D11 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-09","farm":"SAO_JOSE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-09","farm":"SETE_MONTES","activity":"DG+D8 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2026-12-09","farm":"SETE_MONTES","activity":"GNRH B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-10","farm":"MONTE_VERDE","activity":"D10 VACAS 2º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-10","farm":"SETE_MONTES","activity":"DG+D8 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2026-12-10","farm":"TRES_LAGOAS","activity":"D10 VACAS 3º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-11","farm":null,"activity":"FESTA DOS AMIGOS","resp":["RAFAEL"],"type":"evento"},{"date":"2026-12-11","farm":"SANTO_ANTONIO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-11","farm":"SANTO_EXPEDITO","activity":"D7 4º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-11","farm":"SETE_MONTES","activity":"D10 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2026-12-12","farm":null,"activity":"FESTA DOS AMIGOS","resp":["RAFAEL"],"type":"evento"},{"date":"2026-12-12","farm":"DIVINAL","activity":"DG","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-12-12","farm":"SETE_MONTES","activity":"D10 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2026-12-13","farm":"SANTO_EXPEDITO","activity":"DOPPLER + D9 4º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-14","farm":"DUAS_MENINAS","activity":"D0 TODOS BLOCO 3","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-14","farm":"NOVO_HORIZONTE","activity":"D0 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-14","farm":"OURO_BRANCO","activity":"D0 VACAS 2º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-14","farm":"SETE_MONTES","activity":"Visita (sem detalhe na planilha)","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-12-15","farm":"DIVINAL","activity":"DG","resp":["DANILO"],"type":"fazenda","src":"aba Danilo"},{"date":"2026-12-15","farm":"FLORESTA_NEGRA","activity":"D8 VACAS 3º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-12-15","farm":"REMANSO","activity":"D8 MATERNIDADE MULTÍPARAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-15","farm":"SETE_MONTES","activity":"TETF A","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-16","farm":"ABRA","activity":"D7 LOTE IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-16","farm":"INDIANA","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-16","farm":"NOVO_HORIZONTE","activity":"DG+D8 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-16","farm":"SAO_JORGE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-16","farm":"SETE_MONTES","activity":"TETF B","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-17","farm":"FLORESTA_NEGRA","activity":"D10 VACAS 3º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-12-17","farm":"NOVO_HORIZONTE","activity":"D8 NOVILHAS 2º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-12-17","farm":"REMANSO","activity":"D10 MATERNIDADE MULTÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-18","farm":"ABRA","activity":"DG DOPPLER + D9","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-18","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 3º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-12-19","farm":"REMANSO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE MULTÍPARAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-19","farm":"SAO_JOSE","activity":"D0 VACAS/NOVILHAS 4º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2026-12-21","farm":"DUAS_MENINAS","activity":"D7 TODOS BLOCO 3","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-21","farm":"NOVO_HORIZONTE","activity":"DG+D7 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-21","farm":"SANTO_ANTONIO","activity":"D0 VACAS 3º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-22","farm":"GRANDE_SERTAO","activity":"D0 NOVILHAS PRECOCE 3º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-22","farm":"OURO_BRANCO","activity":"DG+D8 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-23","farm":"DUAS_MENINAS","activity":"DOPPLER + D9 VAZIAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-23","farm":"MONTE_VERDE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-23","farm":"NOVO_HORIZONTE","activity":"D10 VACAS/NOVILHAS 4º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2026-12-23","farm":"TRES_LAGOAS","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-24","farm":"OURO_BRANCO","activity":"D10 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-25","farm":null,"activity":"NATAL","resp":["RAFAEL"],"type":"feriado"},{"date":"2026-12-26","farm":null,"activity":"CASA","resp":["RAFAEL"],"type":"pessoal"},{"date":"2026-12-26","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-26","farm":"INDIANA","activity":"D0 3º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-26","farm":"SAO_JORGE","activity":"D0 VACAS/NOVILHAS 4º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-28","farm":null,"activity":"VER SÃO JORGE IMP. NOV.","resp":["RAFAEL"],"type":"evento"},{"date":"2026-12-28","farm":"SAO_JOSE","activity":"DG+D9 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-29","farm":"GRANDE_SERTAO","activity":"DG+D7 NOVILHAS PRECOCE 3º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-29","farm":"REMANSO","activity":"D0 SUPERPRECOCE MULTÍPARAS","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2026-12-29","farm":"SANTO_ANTONIO","activity":"DG+D8 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-30","farm":"SAO_JOSE","activity":"D11 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-31","farm":"GRANDE_SERTAO","activity":"DOPPLER + D9 NOVILHAS PRECEOCE 3º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2026-12-31","farm":"SANTO_ANTONIO","activity":"D10 VACAS 3º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2026-12-31","farm":"SANTO_EXPEDITO","activity":"D0 5º BLOCO","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-01-01","farm":null,"activity":"ANO NOVO","resp":["RAFAEL"],"type":"feriado"},{"date":"2027-01-02","farm":null,"activity":"CASA","resp":["RAFAEL"],"type":"pessoal"},{"date":"2027-01-04","farm":"INDIANA","activity":"DG+D9 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-04","farm":"SAO_JORGE","activity":"DG+D8 VACAS/NOVILHAS 4º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2027-01-04","farm":"SETE_MONTES","activity":"D0 A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-05","farm":"MONTE_VERDE","activity":"D0 VACAS 3º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-05","farm":"OURO_BRANCO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-05","farm":"REMANSO","activity":"D7 SUPERPRECOCE MULTÍPARAS","resp":["EQUIPE"],"type":"fazenda"},{"date":"2027-01-05","farm":"SETE_MONTES","activity":"D0 B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-05","farm":"TRES_LAGOAS","activity":"D0 VACAS 4º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-06","farm":"GRANDE_SERTAO","activity":"D0 VACAS 4º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-06","farm":"INDIANA","activity":"D11 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-06","farm":"SAO_JORGE","activity":"D10 VACAS/NOVILHAS 4º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2027-01-07","farm":"REMANSO","activity":"DOPPLER + D9 SUPERPRECOCE MULTÍPARAS","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-08","farm":"SANTO_EXPEDITO","activity":"DG+D8 5º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-09","farm":"SAO_JOSE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-09","farm":"SINHAZINHA","activity":"D0 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2027-01-10","farm":"SANTO_EXPEDITO","activity":"D9 5º IATF","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-11","farm":"NOVO_HORIZONTE","activity":"D0 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-12","farm":"DIVINAL","activity":"DG","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-01-13","farm":"MONTE_VERDE","activity":"DG+D8 VACAS 3º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-13","farm":"SANTO_ANTONIO","activity":"PRÉ-SYNCH","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-01-13","farm":"SETE_MONTES","activity":"DG+D8 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-01-13","farm":"TRES_LAGOAS","activity":"DG+D8 VACAS 4º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-14","farm":"GRANDE_SERTAO","activity":"D8 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-14","farm":"INDIANA","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-14","farm":"SETE_MONTES","activity":"DG+D8 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-01-15","farm":"MONTE_VERDE","activity":"D10 VACAS 3º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-15","farm":"OURO_BRANCO","activity":"D0 VACAS 3º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-15","farm":"SAO_JORGE","activity":"MANEJO PRÉ-SYNCH VACAS","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-15","farm":"SETE_MONTES","activity":"D10 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-01-15","farm":"TRES_LAGOAS","activity":"D10 VACAS 4º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-16","farm":"GRANDE_SERTAO","activity":"D10 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-16","farm":"SETE_MONTES","activity":"D10 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-01-18","farm":"DIVINAL","activity":"DG","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-01-18","farm":"FLORESTA_NEGRA","activity":"DG+D0 VACAS 4º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2027-01-18","farm":"SINHAZINHA","activity":"D9 VACAS 1º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2027-01-19","farm":"NOVO_HORIZONTE","activity":"DG+D8 VACAS LOTE 2","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-01-20","farm":"SAO_JOSE","activity":"D0 VACAS/NOVILHAS 5º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2027-01-20","farm":"SINHAZINHA","activity":"D11 VACAS 1º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-21","farm":"NOVO_HORIZONTE","activity":"D10 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-22","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-23","farm":"OURO_BRANCO","activity":"DG+D8 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-23","farm":"SANTO_ANTONIO","activity":"D0 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-25","farm":"OURO_BRANCO","activity":"D10 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-25","farm":"SAO_JORGE","activity":"D0 VACAS/NOVILHAS 4º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-26","farm":"FLORESTA_NEGRA","activity":"D8 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-27","farm":"INDIANA","activity":"D0 4º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-27","farm":"SAO_JOSE","activity":"DG+D7 VACAS/NOVILHAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-28","farm":"FLORESTA_NEGRA","activity":"D10 VACAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-29","farm":"MONTE_VERDE","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-29","farm":"SAO_JOSE","activity":"D9 VACAS/NOVILHAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-01-29","farm":"TRES_LAGOAS","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-01-31","farm":"SANTO_EXPEDITO","activity":"D0 5º IATF","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-01","farm":"SANTO_ANTONIO","activity":"DG+D9 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-02","farm":"SAO_JORGE","activity":"DG+D8 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-03","farm":"GRANDE_SERTAO","activity":"D0 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-03","farm":"INDIANA","activity":"D7 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-03","farm":"SANTO_ANTONIO","activity":"D11 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-04","farm":"SAO_JORGE","activity":"D10 VACAS/NOVILHAS 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-05","farm":"INDIANA","activity":"D9 4º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-05","farm":"OURO_BRANCO","activity":"MANEJO PRÉ-SYNCH MATERNIDADE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-08","farm":"MONTE_VERDE","activity":"D0 VACAS 4º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-08","farm":"SETE_MONTES","activity":"D0 A","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-08","farm":"TRES_LAGOAS","activity":"D0 VACAS 5º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-09","farm":"DIVINAL","activity":"DG","resp":["A DEFINIR"],"type":"fazenda","src":"aba Geral"},{"date":"2027-02-09","farm":"SETE_MONTES","activity":"D0 B","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-09","farm":"SINHAZINHA","activity":"D0 VACAS 2º BLOCO","resp":["DANILO"],"type":"fazenda"},{"date":"2027-02-11","farm":"GRANDE_SERTAO","activity":"DG+D8 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-13","farm":"GRANDE_SERTAO","activity":"D10 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-15","farm":"SANTO_ANTONIO","activity":"D0 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-16","farm":"MONTE_VERDE","activity":"DG+D8 VACAS 4º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-16","farm":"OURO_BRANCO","activity":"D0 VACAS 4º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-16","farm":"SETE_MONTES","activity":"DG+D8 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-02-16","farm":"TRES_LAGOAS","activity":"DG+D8 VACAS 5º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-17","farm":"INDIANA","activity":"D0 VACAS 5º BLOCO SUPERPRECOCE TARDE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-17","farm":"SETE_MONTES","activity":"DG+D8 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-02-17","farm":"SINHAZINHA","activity":"DG+D8 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-18","farm":"MONTE_VERDE","activity":"D10 VACAS 4º BLOCO TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-18","farm":"SETE_MONTES","activity":"D10 A","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-02-18","farm":"TRES_LAGOAS","activity":"D10 VACAS 5º BLOCO CEDO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-19","farm":"SETE_MONTES","activity":"D10 B","resp":["TIAGO"],"type":"fazenda"},{"date":"2027-02-19","farm":"SINHAZINHA","activity":"D10 VACAS 2º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-22","farm":"SANTO_ANTONIO","activity":"D7 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-24","farm":"INDIANA","activity":"D7 VACAS 5º BLOCO SUPERPRECOCE","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-02-24","farm":"OURO_BRANCO","activity":"DG+D8 VACAS 4º BLOCO","resp":["VICENTE"],"type":"fazenda"},{"date":"2027-02-24","farm":"SANTO_ANTONIO","activity":"DOPPLER+D9 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-25","farm":"GRANDE_SERTAO","activity":"MANEJO PRÉ-SYNCH","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-26","farm":"INDIANA","activity":"DOPPLER+D9 VACAS 5º BLOCO SUPERPRECOCE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-02-26","farm":"OURO_BRANCO","activity":"D10 VACAS 4º","resp":["VICENTE"],"type":"fazenda"},{"date":"2027-03-02","farm":"MONTE_VERDE","activity":"D0 VACAS 5º BLOCO SUPERPRECOCE TARDE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-08","farm":"GRANDE_SERTAO","activity":"D0 VACAS 6º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-09","farm":"MONTE_VERDE","activity":"D7 VACAS 5º BLOCO SUPERPRECOCE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-10","farm":"OURO_BRANCO","activity":"D0 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-03-11","farm":"MONTE_VERDE","activity":"DOPPLER+D9 VACAS 5º BLOCO SUPERPRECOCE","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-15","farm":"SINHAZINHA","activity":"D0 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-16","farm":"GRANDE_SERTAO","activity":"DG+D8 VACAS 6º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-17","farm":"OURO_BRANCO","activity":"D7 VACAS 5º BLOCO","resp":["FAZENDA"],"type":"fazenda"},{"date":"2027-03-18","farm":"GRANDE_SERTAO","activity":"D10 VACAS 6º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-19","farm":"OURO_BRANCO","activity":"DOPPLER+D9 VACAS 5º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-23","farm":"SINHAZINHA","activity":"DG+D8 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"},{"date":"2027-03-25","farm":"SINHAZINHA","activity":"D10 VACAS 3º BLOCO","resp":["RAFAEL"],"type":"fazenda"}];
+const FARMS = {"ABRA": {"name": "Nelore Abra", "muni": "Nova Cantu"}, "BELA_VISTA": {"name": "Fazenda Bela Vista", "muni": "Araruna"}, "DIVINAL": {"name": "Fazenda Divinal", "muni": ""}, "DUAS_MENINAS": {"name": "Fazenda Duas Meninas", "muni": ""}, "FLORESTA_NEGRA": {"name": "Fazenda Floresta Negra", "muni": "Cianorte"}, "GRANDE_SERTAO": {"name": "Fazenda Grande Sertão", "muni": "Luziânia"}, "INDIANA": {"name": "Fazenda Indiana", "muni": "Iretama"}, "MONTE_VERDE": {"name": "Fazenda Monte Verde", "muni": "Campina da Lagoa"}, "NOVO_HORIZONTE": {"name": "Fazenda Novo Horizonte", "muni": ""}, "OURO_BRANCO": {"name": "Fazenda Ouro Branco", "muni": "Peabiru"}, "PITANGA": {"name": "Fazenda Pitanga", "muni": "Boa Ventura do São Roque"}, "REMANSO": {"name": "Fazenda Remanso", "muni": "Pitanga"}, "SANTO_ANTONIO": {"name": "Fazenda São Joaquim / Santo Antônio", "muni": "Barbosa Ferraz"}, "SANTO_EXPEDITO": {"name": "Fazenda Santo Expedito", "muni": "Luiziana"}, "SAO_CARLOS": {"name": "Fazenda São Carlos", "muni": ""}, "SAO_JORGE": {"name": "Fazenda São Jorge", "muni": "Bom Sucesso"}, "SAO_JOSE": {"name": "Fazenda São José", "muni": "Campina da Lagoa"}, "SAO_PEDRO": {"name": "Sítio São Pedro", "muni": "Corumbataí"}, "SETE_MONTES": {"name": "Fazenda 7 Montes", "muni": ""}, "SINHAZINHA": {"name": "Fazenda Sinhazinha", "muni": "Cafeara"}, "TRES_LAGOAS": {"name": "Fazenda Três Lagoas", "muni": "Altamira"}};
+
+const PEOPLE = {
+  'RAFAEL':   {label:'Rafael',    g:'RAFAEL',  c:'--rafael'},
+  'DANILO':   {label:'Danilo',    g:'DANILO',  c:'--danilo'},
+  'VICENTE':  {label:'Vicente',   g:'VICENTE', c:'--vicente'},
+  'TIAGO':    {label:'Tiago',     g:'TIAGO',   c:'--tiago'},
+  'FAZENDA':  {label:'Fazenda',   g:'FAZENDA', c:'--fazenda'},
+  'EQUIPE':   {label:'Equipe',    g:'OUTROS',  c:'--outros'},
+  'CENATTE':  {label:'Cenatte',   g:'OUTROS',  c:'--outros'},
+  'A DEFINIR':{label:'A definir', g:'OUTROS',  c:'--outros'},
+};
+const FILTER_GROUPS = [
+  {key:'RAFAEL',  label:'Rafael',  c:'--rafael'},
+  {key:'DANILO',  label:'Danilo',  c:'--danilo'},
+  {key:'VICENTE', label:'Vicente', c:'--vicente'},
+  {key:'TIAGO',   label:'Tiago',   c:'--tiago'},
+  {key:'FAZENDA', label:'Fazenda', c:'--fazenda'},
+  {key:'OUTROS',  label:'Equipe / Outros', c:'--outros'},
+];
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const WEEKDAYS_PT = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+function pm(r){ return PEOPLE[r] || {label:r, g:'OUTROS', c:'--outros'}; }
+function groupsOf(e){ return [...new Set(e.resp.map(r=>pm(r).g))]; }
+function mainColor(e){ return `var(${pm(e.resp[0]).c})`; }
+function titleOf(e){ return e.farm ? FARMS[e.farm].name : e.activity; }
+function muniOf(e){ return e.farm ? FARMS[e.farm].muni : ''; }
+function badgesHtml(e){
+  return `<span class="badges">` + e.resp.map(r=>{
+    const p = pm(r);
+    return `<span class="badge" style="background:var(${p.c}-bg);color:var(${p.c})">${esc(p.label)}</span>`;
+  }).join('') + `</span>`;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function localIso(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function fmtShort(iso){ const [y,m,d]=iso.split('-'); return `${d}/${m}/${y.slice(2)}`; }
+function fmtLong(iso){ const [y,m,d]=iso.split('-').map(Number); return `${d} de ${MONTHS[m-1]} de ${y}`; }
+function weekdayOf(iso){ const [y,m,d]=iso.split('-').map(Number); return WEEKDAYS_PT[new Date(y,m-1,d).getDay()]; }
+const TODAY = localIso(new Date());
+
+const state = {
+  active: new Set(FILTER_GROUPS.map(g=>g.key)),
+  view: 'calendar',
+  search: '',
+  cursor: null,
+  selectedFarm: null,
+};
+(function(){
+  const dates = EVENTS.map(e=>e.date).sort();
+  let ref = TODAY;
+  if(ref < dates[0] || ref > dates[dates.length-1]) ref = dates[0];
+  const [y,m] = ref.split('-').map(Number);
+  state.cursor = new Date(y, m-1, 1);
+})();
+
+function matches(e){
+  if(!groupsOf(e).some(g=>state.active.has(g))) return false;
+  if(state.search){
+    const hay = (titleOf(e)+' '+e.activity+' '+e.resp.map(r=>pm(r).label).join(' ')+' '+muniOf(e)).toLowerCase();
+    if(!hay.includes(state.search.toLowerCase())) return false;
+  }
+  return true;
+}
+const filtered = () => EVENTS.filter(matches);
+
+function renderHeader(){
+  const n = Object.keys(FARMS).length;
+  document.getElementById('subtitle').textContent = `Manejo reprodutivo · IATF / TETF · ${n} propriedades`;
+}
+function renderStats(){
+  const f = filtered();
+  const farms = new Set(f.filter(e=>e.farm).map(e=>e.farm)).size;
+  const dates = f.map(e=>e.date).sort();
+  const range = dates.length ? fmtShort(dates[0])+' – '+fmtShort(dates[dates.length-1]) : '—';
+  const by = {}; FILTER_GROUPS.forEach(g=>by[g.key]=0);
+  f.forEach(e=>groupsOf(e).forEach(g=>by[g]++));
+  document.getElementById('stats').innerHTML =
+    `<div class="stat"><div class="n">${f.length}</div><div class="l">Atividades</div></div>
+     <div class="stat"><div class="n">${farms}</div><div class="l">Fazendas ativas</div></div>
+     <div class="stat"><div class="n" style="font-size:13px;line-height:1.5;padding-top:3px">${range}</div><div class="l">Período filtrado</div></div>` +
+    FILTER_GROUPS.map(g=>`<div class="stat"><div class="n" style="color:var(${g.c})">${by[g.key]}</div><div class="l">${g.label}</div></div>`).join('');
+}
+function renderTags(){
+  const row = document.getElementById('tagRow');
+  row.innerHTML = FILTER_GROUPS.map(g=>{
+    const on = state.active.has(g.key);
+    return `<button class="tag ${on?'':'off'}" data-key="${g.key}" style="--c:var(${g.c});--cbg:var(${g.c}-bg);--cl:var(${g.c}-line)">${g.label}</button>`;
+  }).join('') + `<button class="tag" id="tagAll">Todos</button>`;
+  row.querySelectorAll('.tag[data-key]').forEach(b=>b.addEventListener('click',()=>{
+    const k=b.dataset.key; state.active.has(k)?state.active.delete(k):state.active.add(k); renderAll();
+  }));
+  document.getElementById('tagAll').addEventListener('click',()=>{
+    if(state.active.size===FILTER_GROUPS.length) state.active.clear(); else FILTER_GROUPS.forEach(g=>state.active.add(g.key));
+    renderAll();
+  });
+}
+function renderLegend(){
+  document.getElementById('legend').innerHTML =
+    FILTER_GROUPS.map(g=>`<div class="li"><span class="dot" style="background:var(${g.c})"></span>${g.label}</div>`).join('') +
+    `<div class="li" style="margin-left:auto">${EVENTS.length} atividades · clique em um dia ou fazenda para ver detalhes</div>`;
+}
+
+function renderCalendar(){
+  const y=state.cursor.getFullYear(), m=state.cursor.getMonth();
+  document.getElementById('calMonthLabel').textContent = `${MONTHS[m]} ${y}`;
+  const startOffset = new Date(y,m,1).getDay();
+  const dim = new Date(y,m+1,0).getDate();
+  const dprev = new Date(y,m,0).getDate();
+  const by = {}; filtered().forEach(e=>(by[e.date]=by[e.date]||[]).push(e));
+  const cells=[];
+  for(let i=0;i<startOffset;i++) cells.push({n:dprev-startOffset+i+1,other:true});
+  for(let d=1;d<=dim;d++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    cells.push({n:d,iso,today:iso===TODAY,ev:by[iso]||[]});
+  }
+  let t=1; while(cells.length%7) cells.push({n:t++,other:true});
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML = cells.map(c=>{
+    if(c.other) return `<div class="day other"><span class="num">${c.n}</span></div>`;
+    const shown=c.ev.slice(0,3), rest=c.ev.length-shown.length;
+    return `<div class="day ${c.today?'today':''}" data-iso="${c.iso}"><span class="num">${c.n}</span>`+
+      shown.map(e=>{const p=pm(e.resp[0]);return `<div class="bar" style="background:var(${p.c}-bg);color:var(${p.c})">${esc(titleOf(e))}</div>`;}).join('')+
+      (rest>0?`<div class="more">+${rest} mais</div>`:'')+`</div>`;
+  }).join('');
+  grid.querySelectorAll('.day[data-iso]').forEach(c=>c.addEventListener('click',()=>openDrawer(c.dataset.iso)));
+}
+const shiftMonth = n => { state.cursor=new Date(state.cursor.getFullYear(),state.cursor.getMonth()+n,1); renderCalendar(); };
+document.getElementById('prevMonth').addEventListener('click',()=>shiftMonth(-1));
+document.getElementById('nextMonth').addEventListener('click',()=>shiftMonth(1));
+document.getElementById('gotoToday').addEventListener('click',()=>{ const d=new Date(); state.cursor=new Date(d.getFullYear(),d.getMonth(),1); renderCalendar(); });
+
+function openDrawer(iso){
+  const evs = filtered().filter(e=>e.date===iso).sort((a,b)=>titleOf(a).localeCompare(titleOf(b),'pt'));
+  document.getElementById('drawerDate').textContent = weekdayOf(iso);
+  document.getElementById('drawerTitle').textContent = fmtLong(iso);
+  document.getElementById('drawerBody').innerHTML = evs.length ? evs.map(e=>`
+    <div class="drawer-item">
+      <div class="top"><div class="t">${esc(titleOf(e))}</div>${badgesHtml(e)}</div>
+      ${muniOf(e)?`<div class="m">${esc(muniOf(e))}</div>`:''}
+      ${e.farm?`<div class="a">${esc(e.activity)}</div>`:''}
+      ${e.src?`<div class="s">Origem: ${esc(e.src)}${e.resp[0]==='A DEFINIR'?' · responsável não informado':''}</div>`:''}
+    </div>`).join('') : `<div class="empty"><b>Nada por aqui</b>Nenhuma atividade neste dia com os filtros atuais.</div>`;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer(){ document.getElementById('drawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); }
+document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+document.getElementById('drawerOverlay').addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+
+function renderList(){
+  const el=document.getElementById('view-list');
+  const evs=filtered().slice().sort((a,b)=>a.date.localeCompare(b.date)||titleOf(a).localeCompare(titleOf(b),'pt'));
+  if(!evs.length){ el.innerHTML=`<div class="empty"><b>Nada por aqui</b>Ajuste os filtros para ver atividades.</div>`; return; }
+  let html='', curMonth='', curDate='';
+  evs.forEach(e=>{
+    const [y,m,d]=e.date.split('-');
+    const mk=`${MONTHS[+m-1]} ${y}`;
+    if(mk!==curMonth){ if(curDate) html+='</div>'; curMonth=mk; curDate=''; html+=`<div class="list-month">${mk}</div>`; }
+    if(e.date!==curDate){ if(curDate) html+='</div>'; curDate=e.date;
+      html+=`<div class="day-group ${e.date===TODAY?'is-today':''}"><div class="day-group-head"><span class="d">${d}</span><span class="w">${weekdayOf(e.date)}${e.date===TODAY?' · hoje':''}</span></div>`; }
+    html+=`<div class="item"><span class="dot" style="background:${mainColor(e)}"></span>
+      <div class="item-body"><div class="item-farm">${esc(titleOf(e))}</div>${e.farm?`<div class="item-act">${esc(e.activity)}</div>`:''}</div>${badgesHtml(e)}</div>`;
+  });
+  el.innerHTML = html+'</div>';
+}
+
+function renderFarms(){
+  const keys = Object.keys(FARMS).sort((a,b)=>FARMS[a].name.localeCompare(FARMS[b].name,'pt'));
+  const f = filtered();
+  const listEl=document.getElementById('farmsList');
+  listEl.innerHTML = keys.map(k=>{
+    const evs=f.filter(e=>e.farm===k);
+    const ppl=[...new Set(evs.flatMap(e=>e.resp))];
+    return `<div class="farm-card ${state.selectedFarm===k?'active':''}" data-farm="${k}">
+      <div class="name">${esc(FARMS[k].name)}</div>
+      ${FARMS[k].muni?`<div class="muni">${esc(FARMS[k].muni)}</div>`:''}
+      <div class="meta"><span>${evs.length} atividade${evs.length===1?'':'s'}</span>
+      <span class="dotrow">${ppl.map(p=>`<span class="d" style="background:var(${pm(p).c})"></span>`).join('')}</span></div></div>`;
+  }).join('');
+  listEl.querySelectorAll('.farm-card').forEach(c=>c.addEventListener('click',()=>{ state.selectedFarm=c.dataset.farm; renderFarms(); }));
+  if(!state.selectedFarm) state.selectedFarm=keys[0];
+  const sel=state.selectedFarm;
+  const evs=f.filter(e=>e.farm===sel).sort((a,b)=>a.date.localeCompare(b.date));
+  document.getElementById('farmDetail').innerHTML = `
+    <h2>${esc(FARMS[sel].name)}</h2>
+    <div class="sub">${FARMS[sel].muni?esc(FARMS[sel].muni)+' · ':''}${evs.length} atividade${evs.length===1?'':'s'} programada${evs.length===1?'':'s'}</div>
+    ${evs.length?`<div class="timeline">${evs.map(e=>`
+      <div class="tnode ${e.date<TODAY?'past':''}" style="--c:${mainColor(e)}">
+        <div class="tdate">${fmtLong(e.date)} · ${weekdayOf(e.date)}</div>
+        <div class="tact">${esc(e.activity)}</div>${badgesHtml(e)}</div>`).join('')}</div>`
+      :`<div class="empty"><b>Sem atividades</b>Nenhuma atividade para os filtros atuais nesta fazenda.</div>`}`;
+}
+
+document.querySelectorAll('.views button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.views button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  state.view=b.dataset.view; document.getElementById('view-'+state.view).classList.add('active'); renderAll();
+}));
+document.getElementById('searchInput').addEventListener('input',e=>{ state.search=e.target.value.trim(); renderAll(); });
+
+function renderAll(){
+  renderTags(); renderStats(); renderLegend();
+  if(state.view==='calendar') renderCalendar();
+  if(state.view==='list') renderList();
+  if(state.view==='farms') renderFarms();
+}
+renderHeader(); renderAll();
+</script>
+</body>
+</html>
